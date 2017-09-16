@@ -3,7 +3,7 @@ import Head from "next/head";
 
 export default class extends React.Component {
   componentDidMount() {
-    this.initDatGUI(Vars.stage);
+    this.initDatGUI({});
   }
 
   initDatGUI(stage) {

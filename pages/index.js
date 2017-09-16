@@ -1,7 +1,9 @@
+import Canvas from "../components/Canvas";
+
 export default () => (
   <div>
 
-    hello
+    <Canvas />
 
     <style jsx>{`
       div {
