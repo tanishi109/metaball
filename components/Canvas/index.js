@@ -1,9 +1,29 @@
 import React from "react";
 import Head from "next/head";
 
+const renderStage = () => {
+  const canvas = document.getElementById("stage");
+  const ctx = canvas.getContext("2d");
+  const width = document.getElementById("wrapper").clientWidth;
+  const height = document.getElementById("wrapper").clientHeight;
+
+  canvas.setAttribute("width", width);
+  canvas.setAttribute("height", height);
+
+  ctx.beginPath();
+  ctx.arc(100, 100, 10, 0, 360 * Math.PI / 180,);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(200, 100, 10, 0, 360 * Math.PI / 180,);
+  ctx.stroke();
+};
+
 export default class extends React.Component {
   componentDidMount() {
     this.initDatGUI({});
+
+    renderStage();
   }
 
   initDatGUI(stage) {
