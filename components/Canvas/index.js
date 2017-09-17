@@ -10,13 +10,50 @@ const renderStage = () => {
   canvas.setAttribute("width", width);
   canvas.setAttribute("height", height);
 
-  ctx.beginPath();
-  ctx.arc(100, 100, 10, 0, 360 * Math.PI / 180,);
-  ctx.stroke();
+  const arcs = [
+    [100, 100],
+    [200, 100],
+  ]
 
-  ctx.beginPath();
-  ctx.arc(200, 100, 10, 0, 360 * Math.PI / 180,);
-  ctx.stroke();
+  arcs.forEach((arc) => {
+    ctx.beginPath();
+    ctx.arc(...arc, 10, 0, 360 * Math.PI / 180);
+    ctx.stroke();
+  });
+
+  const c = 10; // 調整必要かも?
+  const ts = 10;
+  const te = 30;
+  const getDensity = (tm) => {
+    return (c / (ts - te) ** 2) * (tm - te) ** 2;
+  };
+  const getDistance = (x1, y1, x2, y2) => {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+  };
+  const hasEnoughDensity = (arc, x, y) => {
+    const d = getDistance(...arc, x, y);
+
+    if (d <= 30) {
+      const dens = getDensity(d);
+
+      return dens >= 1.0;
+    }
+
+    return false;
+  };
+
+  // get cm for first arc;
+  for (let x = 0; x <= 230; x++) {
+    for (let y = 0; y <= 130; y++) {
+      arcs.forEach((arc) => {
+        if (hasEnoughDensity(arc, x, y)) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1, 0, 360 * Math.PI / 180);
+          ctx.stroke();
+        }
+      });
+    }
+  }
 };
 
 export default class extends React.Component {
