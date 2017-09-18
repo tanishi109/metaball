@@ -24,34 +24,70 @@ const renderStage = () => {
   const c = 10; // 調整必要かも?
   const ts = 10;
   const te = 30;
-  const getDensity = (tm) => {
-    return (c / (ts - te) ** 2) * (tm - te) ** 2;
+  const getConcentration = (tm) => {
+    return (c / ((ts - te) ** 2)) * ((tm - te) ** 2);
   };
   const getDistance = (x1, y1, x2, y2) => {
     return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
   };
-  const hasEnoughDensity = (arc, x, y) => {
-    const d = getDistance(...arc, x, y);
+  const drawByConcentration = (arcs, x1, y1, cellSize) => {
+    const x2 = x1 + cellSize;
+    const y2 = y1 + cellSize;
 
-    if (d <= 30) {
-      const dens = getDensity(d);
+    const vertexes = [
+      [x1, y1], [x2, y1],
+      [x1, y2], [x2, y2],
+    ];
 
-      return dens >= 1.0;
-    }
+    const clim = 0.3;
+    const vc = vertexes.map((v) => {
+      const [x, y] = v;
 
-    return false;
-  };
-
-  // get cm for first arc;
-  for (let x = 0; x <= 230; x++) {
-    for (let y = 0; y <= 130; y++) {
+      let sum = 0;
       arcs.forEach((arc) => {
-        if (hasEnoughDensity(arc, x, y)) {
-          ctx.beginPath();
-          ctx.arc(x, y, 1, 0, 360 * Math.PI / 180);
-          ctx.stroke();
+        const d = getDistance(...arc, x, y);
+        const c = getConcentration(d);
+
+        if (d <= 30) {
+          sum += c;
         }
       });
+
+      return sum;
+    });
+
+    const flg = vc.map((c) => {
+      return c >= clim ? "1" : "0";
+    }).join("");
+
+    if (flg === "1111" || flg === "0000") {
+      return;
+    }
+
+    const [
+      c1, c2,
+      c3, c4,
+    ] = vc;
+
+    if (flg === "0001") {
+      const x3 = x1 * (Math.abs(c4 - clim) / Math.abs(c4 - c3)) + x2 * (Math.abs(c3 - clim) / Math.abs(c4 - c3));
+      const y3 = y1 * (Math.abs(c4 - clim) / Math.abs(c4 - c3)) + y2 * (Math.abs(c3 - clim) / Math.abs(c4 - c3));
+
+      ctx.beginPath();
+      ctx.moveTo(x3, y2);
+      ctx.lineTo(x2, y3);
+      ctx.stroke();
+      ctx.closePath();
+    }
+  };
+
+  const xlim = 230;
+  const ylim = 130;
+  const division = 10;
+
+  for (let x = 0; x <= xlim / division; x++) {
+    for (let y = 0; y <= ylim / division; y++) {
+      drawByConcentration(arcs, x * division, y * division, division);
     }
   }
 };
