@@ -69,16 +69,30 @@ const renderStage = () => {
       c3, c4,
     ] = vc;
 
+    let ary = [];
+    if (flg === "1101") {
+      ary = [
+        [c3, c4, c1],
+      ];
+    }
     if (flg === "0001") {
-      const x3 = x1 * (Math.abs(c4 - clim) / Math.abs(c4 - c3)) + x2 * (Math.abs(c3 - clim) / Math.abs(c4 - c3));
-      const y3 = y1 * (Math.abs(c4 - clim) / Math.abs(c4 - c3)) + y2 * (Math.abs(c3 - clim) / Math.abs(c4 - c3));
+      ary = [
+        [c4, c3, c2],
+      ];
+    }
+
+    ary.forEach((a) => {
+      const [c, cx, cy] = a;
+      // x1, x2 も変数にしないとダメそう
+      const x3 = x1 * (Math.abs(c - clim) / Math.abs(c - cx)) + x2 * (Math.abs(cx - clim) / Math.abs(c - cx));
+      const y3 = y1 * (Math.abs(c - clim) / Math.abs(c - cy)) + y2 * (Math.abs(cy - clim) / Math.abs(c - cy));
 
       ctx.beginPath();
       ctx.moveTo(x3, y2);
       ctx.lineTo(x2, y3);
       ctx.stroke();
       ctx.closePath();
-    }
+    });
   };
 
   const xlim = 230;
