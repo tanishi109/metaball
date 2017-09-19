@@ -77,20 +77,22 @@ const renderStage = (x = 200, division = 5) => {
     // holizontal
     if (flg === "1100" || flg === "0011") {
       const y3 = y2 * (Math.abs(c1 - clim) / Math.abs(c1 - c3)) + y1 * (Math.abs(c3 - clim) / Math.abs(c1 - c3));
-
+      const y4 = y2 * (Math.abs(c2 - clim) / Math.abs(c2 - c4)) + y1 * (Math.abs(c4 - clim) / Math.abs(c2 - c4));
+      
       ctx.beginPath();
       ctx.moveTo(x1, y3);
-      ctx.lineTo(x2, y3);
+      ctx.lineTo(x2, y4);
       ctx.stroke();
       ctx.closePath();
     }
     // vertical
     if (flg === "1010" || flg === "0101") {
       const x3 = x2 * (Math.abs(c1 - clim) / Math.abs(c1 - c2)) + x1 * (Math.abs(c2 - clim) / Math.abs(c1 - c2));
+      const x4 = x2 * (Math.abs(c3 - clim) / Math.abs(c3 - c4)) + x1 * (Math.abs(c4 - clim) / Math.abs(c3 - c4));
 
       ctx.beginPath();
       ctx.moveTo(x3, y1);
-      ctx.lineTo(x3, y2);
+      ctx.lineTo(x4, y2);
       ctx.stroke();
       ctx.closePath();
     }
@@ -169,7 +171,7 @@ export default class extends React.Component {
       renderStage(val, params.division);
     });
 
-    const ed = gui.add(params, "division", 1, 10);
+    const ed = gui.add(params, "division", 2, 20);
     ed.onChange((val) => {
       renderStage(params.x, val);
     });
