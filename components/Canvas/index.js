@@ -1,7 +1,7 @@
 import React from "react";
 import Head from "next/head";
 
-const renderStage = () => {
+const renderStage = (x = 200, division = 5) => {
   const canvas = document.getElementById("stage");
   const ctx = canvas.getContext("2d");
   const width = document.getElementById("wrapper").clientWidth;
@@ -10,20 +10,24 @@ const renderStage = () => {
   canvas.setAttribute("width", width);
   canvas.setAttribute("height", height);
 
+  ctx.clearRect(0, 0, width, height);
+
   const arcs = [
     [100, 100],
-    [200, 100],
-  ]
+    [x, 100],
+    [100, x],
+  ];
 
+  const r = 5;
   arcs.forEach((arc) => {
     ctx.beginPath();
-    ctx.arc(...arc, 10, 0, 360 * Math.PI / 180);
+    ctx.arc(...arc, r, 0, 360 * Math.PI / 180);
     ctx.stroke();
   });
 
   const c = 10; // 調整必要かも?
-  const ts = 10;
-  const te = 30;
+  const ts = r;
+  const te = 40;
   const getConcentration = (tm) => {
     return (c / ((ts - te) ** 2)) * ((tm - te) ** 2);
   };
@@ -39,7 +43,7 @@ const renderStage = () => {
       [x1, y2], [x2, y2],
     ];
 
-    const clim = 0.3;
+    const clim = 3;
     const vc = vertexes.map((v) => {
       const [x, y] = v;
 
@@ -48,7 +52,7 @@ const renderStage = () => {
         const d = getDistance(...arc, x, y);
         const c = getConcentration(d);
 
-        if (d <= 30) {
+        if (d <= te) {
           sum += c;
         }
       });
@@ -70,34 +74,74 @@ const renderStage = () => {
     ] = vc;
 
     let ary = [];
-    if (flg === "1101") {
-      ary = [
-        [c3, c4, c1],
-      ];
-    }
-    if (flg === "0001") {
-      ary = [
-        [c4, c3, c2],
-      ];
-    }
+    // holizontal
+    if (flg === "1100" || flg === "0011") {
+      const y3 = y2 * (Math.abs(c1 - clim) / Math.abs(c1 - c3)) + y1 * (Math.abs(c3 - clim) / Math.abs(c1 - c3));
 
-    ary.forEach((a) => {
-      const [c, cx, cy] = a;
-      // x1, x2 も変数にしないとダメそう
-      const x3 = x1 * (Math.abs(c - clim) / Math.abs(c - cx)) + x2 * (Math.abs(cx - clim) / Math.abs(c - cx));
-      const y3 = y1 * (Math.abs(c - clim) / Math.abs(c - cy)) + y2 * (Math.abs(cy - clim) / Math.abs(c - cy));
+      ctx.beginPath();
+      ctx.moveTo(x1, y3);
+      ctx.lineTo(x2, y3);
+      ctx.stroke();
+      ctx.closePath();
+    }
+    // vertical
+    if (flg === "1010" || flg === "0101") {
+      const x3 = x2 * (Math.abs(c1 - clim) / Math.abs(c1 - c2)) + x1 * (Math.abs(c2 - clim) / Math.abs(c1 - c2));
+
+      ctx.beginPath();
+      ctx.moveTo(x3, y1);
+      ctx.lineTo(x3, y2);
+      ctx.stroke();
+      ctx.closePath();
+    }
+    // left top
+    if (flg === "1000" || flg === "0111" || flg === "1001") {
+      const x3 = x2 * (Math.abs(c1 - clim) / Math.abs(c1 - c2)) + x1 * (Math.abs(c2 - clim) / Math.abs(c1 - c2));
+      const y3 = y2 * (Math.abs(c1 - clim) / Math.abs(c1 - c3)) + y1 * (Math.abs(c3 - clim) / Math.abs(c1 - c3));
+
+      ctx.beginPath();
+      ctx.moveTo(x3, y1);
+      ctx.lineTo(x1, y3);
+      ctx.stroke();
+      ctx.closePath();
+    }
+    // right top
+    if (flg === "0100" || flg === "1011" || flg === "0110") {
+      const x3 = x1 * (Math.abs(c2 - clim) / Math.abs(c2 - c1)) + x2 * (Math.abs(c1 - clim) / Math.abs(c2 - c1));
+      const y3 = y2 * (Math.abs(c2 - clim) / Math.abs(c2 - c4)) + y1 * (Math.abs(c4 - clim) / Math.abs(c2 - c4));
+
+      ctx.beginPath();
+      ctx.moveTo(x3, y1);
+      ctx.lineTo(x2, y3);
+      ctx.stroke();
+      ctx.closePath();
+    }
+    // left bottom
+    if (flg === "1101" || flg === "0010" || flg === "0110") {
+      const x3 = x2 * (Math.abs(c3 - clim) / Math.abs(c3 - c4)) + x1 * (Math.abs(c4 - clim) / Math.abs(c3 - c4));
+      const y3 = y1 * (Math.abs(c3 - clim) / Math.abs(c3 - c1)) + y2 * (Math.abs(c1 - clim) / Math.abs(c3 - c1));
+
+      ctx.beginPath();
+      ctx.moveTo(x3, y2);
+      ctx.lineTo(x1, y3);
+      ctx.stroke();
+      ctx.closePath();
+    }
+    // right bottom
+    if (flg === "0001" || flg === "1110" || flg === "1001") {
+      const x3 = x1 * (Math.abs(c4 - clim) / Math.abs(c4 - c3)) + x2 * (Math.abs(c3 - clim) / Math.abs(c4 - c3));
+      const y3 = y1 * (Math.abs(c4 - clim) / Math.abs(c4 - c2)) + y2 * (Math.abs(c2 - clim) / Math.abs(c4 - c2));
 
       ctx.beginPath();
       ctx.moveTo(x3, y2);
       ctx.lineTo(x2, y3);
       ctx.stroke();
       ctx.closePath();
-    });
+    }
   };
 
   const xlim = 230;
-  const ylim = 130;
-  const division = 10;
+  const ylim = 230;
 
   for (let x = 0; x <= xlim / division; x++) {
     for (let y = 0; y <= ylim / division; y++) {
@@ -108,13 +152,27 @@ const renderStage = () => {
 
 export default class extends React.Component {
   componentDidMount() {
-    this.initDatGUI({});
+    this.initDatGUI();
 
     renderStage();
   }
 
-  initDatGUI(stage) {
+  initDatGUI() {
     const gui = new dat.GUI();
+    const params = {
+      x: 200,
+      division: 5,
+    };
+
+    const ex = gui.add(params, "x", 100, 200);
+    ex.onChange((val) => {
+      renderStage(val, params.division);
+    });
+
+    const ed = gui.add(params, "division", 1, 10);
+    ed.onChange((val) => {
+      renderStage(params.x, val);
+    });
   }
 
   render() {
